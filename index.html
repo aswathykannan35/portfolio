@@ -5,528 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aswathy TK — Data Analyst</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #080810;
-    --surface: #0e0e1a;
-    --accent: #a78bfa;
-    --accent2: #f472b6;
-    --accent3: #34d399;
-    --text: #e8e6ff;
-    --muted: #6b6a8a;
-    --border: rgba(167,139,250,0.15);
-    --glow: rgba(167,139,250,0.3);
-  }
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    overflow-x: hidden;
-    cursor: none;
-  }
-
-  /* Custom cursor */
-  .cursor {
-    position: fixed; width: 12px; height: 12px;
-    background: var(--accent); border-radius: 50%;
-    pointer-events: none; z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: width 0.2s, height 0.2s, background 0.2s;
-    mix-blend-mode: screen;
-  }
-  .cursor-ring {
-    position: fixed; width: 36px; height: 36px;
-    border: 1px solid var(--accent); border-radius: 50%;
-    pointer-events: none; z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: all 0.12s ease-out;
-    opacity: 0.6;
-  }
-  body:hover .cursor { opacity: 1; }
-
-  /* Canvas */
-  #particle-canvas {
-    position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none; z-index: 0;
-    opacity: 0.5;
-  }
-
-  /* Nav */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.5rem 3rem;
-    background: rgba(8,8,16,0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 1.2rem;
-    color: var(--accent);
-    letter-spacing: -0.02em;
-  }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
-  .nav-links a {
-    color: var(--muted); text-decoration: none;
-    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
-    transition: color 0.2s;
-    position: relative;
-  }
-  .nav-links a::after {
-    content: ''; position: absolute; bottom: -4px; left: 0;
-    width: 0; height: 1px; background: var(--accent);
-    transition: width 0.3s;
-  }
-  .nav-links a:hover { color: var(--accent); }
-  .nav-links a:hover::after { width: 100%; }
-
-  /* Sections */
-  section { position: relative; z-index: 1; }
-
-  /* Hero */
-  #hero {
-    min-height: 100vh;
-    display: flex; align-items: center;
-    padding: 8rem 5rem 4rem;
-    position: relative;
-  }
-  .hero-inner {
-    display: grid; grid-template-columns: 1fr 1fr;
-    align-items: center; gap: 4rem;
-    max-width: 1200px; margin: 0 auto; width: 100%;
-  }
-  .hero-left { position: relative; z-index: 2; }
-  .hero-tag {
-    display: inline-block;
-    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--accent3); border: 1px solid rgba(52,211,153,0.3);
-    background: rgba(52,211,153,0.06);
-    padding: 0.4rem 1rem; border-radius: 2rem;
-    margin-bottom: 1.5rem;
-    animation: fadeUp 0.8s ease forwards;
-    opacity: 0;
-  }
-  .hero-name {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(2.8rem, 5.5vw, 5rem);
-    font-weight: 800;
-    line-height: 1.0;
-    letter-spacing: -0.04em;
-    margin-bottom: 1.2rem;
-    animation: fadeUp 0.8s 0.2s ease forwards;
-    opacity: 0;
-    text-align: left;
-  }
-  .hero-name .line1 { display: block; color: var(--text); }
-  .hero-name .line2 {
-    display: block;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-style: italic;
-    font-family: 'Instrument Serif', serif;
-  }
-  .hero-sub {
-    font-size: 0.85rem; color: var(--muted);
-    max-width: 420px; line-height: 1.8;
-    animation: fadeUp 0.8s 0.4s ease forwards;
-    opacity: 0;
-    margin-bottom: 2rem;
-    text-align: left;
-  }
-  .hero-cta {
-    display: flex; gap: 1rem; flex-wrap: wrap;
-    animation: fadeUp 0.8s 0.6s ease forwards;
-    opacity: 0;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: #080810; font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 0.8rem; letter-spacing: 0.05em;
-    padding: 0.85rem 2rem; border-radius: 2rem;
-    text-decoration: none; border: none; cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--glow); }
-  .btn-ghost {
-    background: transparent; color: var(--text);
-    font-family: 'Syne', sans-serif; font-weight: 700;
-    font-size: 0.8rem; letter-spacing: 0.05em;
-    padding: 0.85rem 2rem; border-radius: 2rem;
-    text-decoration: none; border: 1px solid var(--border);
-    cursor: pointer; transition: border-color 0.2s, color 0.2s;
-  }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* Hero Right */
-  .hero-right {
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-    animation: fadeUp 0.8s 0.3s ease forwards;
-    opacity: 0;
-  }
-  .orbit-container {
-    position: relative;
-    width: 460px; height: 460px;
-  }
-
-  /* Center photo */
-  .hero-photo-wrap {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    border: 3px solid var(--accent);
-    box-shadow: 0 0 40px rgba(167,139,250,0.35), 0 0 80px rgba(167,139,250,0.1);
-    overflow: hidden;
-    z-index: 3;
-    background: var(--surface);
-  }
-  .hero-photo-wrap img {
-    width: 100%; height: 100%; object-fit: cover; object-position: top;
-  }
-  .hero-photo-placeholder {
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800;
-    background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(244,114,182,0.2));
-    color: var(--accent);
-  }
-
-  /* Orbit canvas sits behind photo */
-  #orbit-canvas {
-    position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  /* Floating tool pill badges – positioned by JS */
-  .orbit-badge {
-    position: absolute;
-    display: flex; align-items: center; gap: 6px;
-    background: rgba(14,14,26,0.92);
-    border: 1px solid rgba(167,139,250,0.3);
-    border-radius: 2rem;
-    padding: 6px 14px 6px 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem; color: var(--text);
-    white-space: nowrap;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 12px rgba(167,139,250,0.12);
-    z-index: 4;
-    pointer-events: auto;
-    transform: translate(-50%, -50%);
-    transition: box-shadow 0.25s, border-color 0.25s, transform 0.2s;
-    cursor: default;
-    backdrop-filter: blur(8px);
-  }
-  .orbit-badge:hover {
-    border-color: var(--accent);
-    box-shadow: 0 4px 24px rgba(167,139,250,0.35);
-    transform: translate(-50%, -50%) scale(1.08);
-  }
-  .orbit-badge .badge-icon {
-    font-size: 1.1rem; line-height: 1;
-    width: 26px; height: 26px;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(167,139,250,0.1);
-    border-radius: 50%;
-  }
-  .orbit-badge .badge-label {
-    font-size: 0.62rem; letter-spacing: 0.06em;
-    color: var(--text);
-  }
-
-  .scroll-indicator {
-    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-    color: var(--muted); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
-    animation: bounce 2s infinite;
-  }
-  .scroll-line {
-    width: 1px; height: 40px;
-    background: linear-gradient(to bottom, var(--accent), transparent);
-  }
-
-  @media (max-width: 900px) {
-    #hero { padding: 7rem 1.5rem 4rem; }
-    .hero-inner { grid-template-columns: 1fr; text-align: center; }
-    .hero-name, .hero-sub { text-align: center; }
-    .hero-cta { justify-content: center; }
-    .hero-right { margin-top: 3rem; }
-    .orbit-container { width: 340px; height: 340px; }
-    .hero-photo-wrap { width: 150px; height: 150px; }
-  }
-
-  /* Stats bar */
-  .stats-bar {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .stat-item {
-    padding: 2rem;
-    border-right: 1px solid var(--border);
-    text-align: center;
-  }
-  .stat-item:last-child { border-right: none; }
-  .stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 2.5rem; font-weight: 800;
-    color: var(--accent); display: block;
-  }
-  .stat-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; }
-
-  /* About */
-  #about { padding: 8rem 3rem; max-width: 1200px; margin: 0 auto; }
-  .section-label {
-    font-size: 0.65rem; color: var(--accent); letter-spacing: 0.25em;
-    text-transform: uppercase; margin-bottom: 1rem;
-    display: flex; align-items: center; gap: 0.75rem;
-  }
-  .section-label::before {
-    content: ''; display: block; width: 2rem; height: 1px; background: var(--accent);
-  }
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
-  .about-heading {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
-    margin-bottom: 1.5rem;
-  }
-  .about-heading em { font-family: 'Instrument Serif', serif; font-style: italic; color: var(--accent2); }
-  .about-text { color: var(--muted); line-height: 2; font-size: 0.85rem; margin-bottom: 1.5rem; }
-  .about-right { position: relative; }
-  .about-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .about-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-  }
-  .card-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .card-val { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 1.5rem; }
-  .progress-row { margin-bottom: 1rem; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-bottom: 0.4rem; }
-  .progress-track { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 2px; transition: width 1.5s cubic-bezier(0.4,0,0.2,1); width: 0; }
-
-  /* Skills */
-  #skills { padding: 8rem 3rem; background: var(--surface); }
-  .skills-inner { max-width: 1200px; margin: 0 auto; }
-  .skills-heading {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800; margin-bottom: 4rem; letter-spacing: -0.03em;
-  }
-  .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-  .tool-card {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 0.75rem; padding: 1.5rem;
-    display: flex; align-items: center; gap: 1rem;
-    transition: border-color 0.3s, transform 0.3s;
-    cursor: default;
-    position: relative; overflow: hidden;
-  }
-  .tool-card:hover {
-    border-color: var(--accent); transform: translateY(-4px);
-  }
-  .tool-card::after {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(167,139,250,0.08), transparent 70%);
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .tool-card:hover::after { opacity: 1; }
-  .tool-icon { font-size: 2rem; }
-  .tool-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
-  .tool-level { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.2rem; }
-
-  /* Projects */
-  #projects { padding: 8rem 3rem; max-width: 1200px; margin: 0 auto; }
-  .projects-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
-  .projects-heading {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800; letter-spacing: -0.03em;
-  }
-  .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-  .project-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 1rem; padding: 2rem;
-    transition: border-color 0.3s, transform 0.3s;
-    position: relative; overflow: hidden;
-    cursor: default;
-  }
-  .project-card.featured {
-    grid-column: span 2;
-    background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(244,114,182,0.05));
-    border-color: rgba(167,139,250,0.3);
-  }
-  .project-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-  .project-card.featured:hover { transform: translateY(-4px); }
-  .project-num {
-    font-size: 0.6rem; color: var(--accent); letter-spacing: 0.2em;
-    text-transform: uppercase; margin-bottom: 1rem;
-    font-family: 'DM Mono', monospace;
-  }
-  .project-title {
-    font-family: 'Syne', sans-serif; font-size: 1.2rem;
-    font-weight: 700; margin-bottom: 0.75rem;
-    color: var(--text);
-  }
-  .project-card.featured .project-title { font-size: 1.6rem; }
-  .project-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.8; margin-bottom: 1.5rem; }
-  .project-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .tag {
-    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.3rem 0.75rem; border-radius: 2rem;
-    background: rgba(167,139,250,0.1); color: var(--accent);
-    border: 1px solid rgba(167,139,250,0.2);
-  }
-  .tag.green { background: rgba(52,211,153,0.1); color: var(--accent3); border-color: rgba(52,211,153,0.2); }
-  .tag.pink { background: rgba(244,114,182,0.1); color: var(--accent2); border-color: rgba(244,114,182,0.2); }
-  .project-glow {
-    position: absolute; top: -50%; right: -30%;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(167,139,250,0.1), transparent 70%);
-    pointer-events: none;
-  }
-
-  /* Experience */
-  #experience { padding: 8rem 3rem; background: var(--surface); }
-  .exp-inner { max-width: 1200px; margin: 0 auto; }
-  .exp-heading {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4rem;
-  }
-  .timeline { position: relative; }
-  .timeline::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 1px; background: var(--border);
-  }
-  .timeline-item {
-    position: relative; padding-left: 3rem; margin-bottom: 3.5rem;
-    opacity: 0; transform: translateX(-20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .timeline-item.visible { opacity: 1; transform: translateX(0); }
-  .timeline-dot {
-    position: absolute; left: -5px; top: 0.3rem;
-    width: 11px; height: 11px; border-radius: 50%;
-    background: var(--accent); box-shadow: 0 0 12px var(--glow);
-  }
-  .exp-date { font-size: 0.65rem; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .exp-role { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
-  .exp-company { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem; }
-  .exp-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.9; }
-
-  /* Education */
-  #education { padding: 8rem 3rem; max-width: 1200px; margin: 0 auto; }
-  .edu-heading {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4rem;
-  }
-  .edu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .edu-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 1rem; padding: 2.5rem;
-    position: relative; overflow: hidden;
-    transition: border-color 0.3s, transform 0.3s;
-  }
-  .edu-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-  .edu-card::before {
-    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-  }
-  .edu-degree { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .edu-school { font-size: 0.78rem; color: var(--accent); margin-bottom: 0.25rem; }
-  .edu-year { font-size: 0.7rem; color: var(--muted); margin-bottom: 1rem; }
-  .edu-cgpa {
-    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
-    color: var(--text); display: flex; align-items: baseline; gap: 0.5rem;
-  }
-  .edu-cgpa span { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; font-weight: 400; }
-
-  /* Contact */
-  #contact { padding: 8rem 3rem; text-align: center; position: relative; }
-  .contact-glow {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 400px;
-    background: radial-gradient(ellipse, rgba(167,139,250,0.08), transparent 70%);
-    pointer-events: none;
-  }
-  .contact-heading {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(3rem, 8vw, 7rem);
-    font-weight: 800; letter-spacing: -0.04em; line-height: 1;
-    margin-bottom: 1.5rem; position: relative; z-index: 1;
-  }
-  .contact-heading em { font-family: 'Instrument Serif', serif; font-style: italic; color: var(--accent); }
-  .contact-email {
-    font-size: 0.85rem; color: var(--muted);
-    margin-bottom: 3rem; position: relative; z-index: 1;
-  }
-  .contact-email a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--border); padding-bottom: 2px; transition: border-color 0.2s; }
-  .contact-email a:hover { border-color: var(--accent); }
-  .social-links { display: flex; gap: 1rem; justify-content: center; position: relative; z-index: 1; }
-  .social-link {
-    display: flex; align-items: center; gap: 0.5rem;
-    color: var(--muted); text-decoration: none; font-size: 0.75rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.75rem 1.5rem; border: 1px solid var(--border);
-    border-radius: 2rem; transition: border-color 0.2s, color 0.2s;
-  }
-  .social-link:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* Footer */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem 3rem;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em;
-    position: relative; z-index: 1;
-  }
-
-  /* Animations */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(8px); }
-  }
-  .reveal {
-    opacity: 0; transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-  .reveal-delay-1 { transition-delay: 0.1s; }
-  .reveal-delay-2 { transition-delay: 0.2s; }
-  .reveal-delay-3 { transition-delay: 0.3s; }
-
-  @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { display: none; }
-    .stats-bar { grid-template-columns: repeat(2, 1fr); }
-    .about-grid, .tools-grid, .projects-grid, .edu-grid { grid-template-columns: 1fr; }
-    .project-card.featured { grid-column: span 1; }
-    .projects-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    #about, #projects, #experience, #education, #contact, #skills { padding: 5rem 1.5rem; }
-    .exp-inner, .skills-inner { padding: 0; }
-    footer { flex-direction: column; gap: 1rem; text-align: center; }
-  }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -542,6 +21,16 @@
     <li><a href="#projects">Projects</a></li>
     <li><a href="#experience">Experience</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li>
+      <a href="Aswathy_TK_Resume.pdf" download="Aswathy_TK_Resume.pdf" class="nav-resume">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Resume
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -559,6 +48,14 @@
       <div class="hero-cta">
         <a href="#projects" class="btn-primary">View My Work</a>
         <a href="mailto:aswathytkofficial@gmail.com" class="btn-ghost">Get in Touch</a>
+        <a href="Aswathy_TK_Resume.pdf" download="Aswathy_TK_Resume.pdf" class="btn-ghost" style="display:inline-flex;align-items:center;gap:0.4rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download Resume
+        </a>
       </div>
     </div>
 
@@ -573,30 +70,81 @@
         <!-- 📸 TO ADD YOUR PHOTO: replace .hero-photo-placeholder with:
              <img src="your-photo.jpg" alt="Aswathy TK"> -->
         <div class="hero-photo-wrap">
-          <div class="hero-photo-placeholder">AT</div>
+          <div class="hero-photo-placeholder"><img src="photo2.png" alt="Aswathy TK"></div>
         </div>
 
         <!-- Tool badges – JS will position these dynamically -->
-        <div class="orbit-badge" data-orbit="1" data-index="0" data-angle="0">
-          <span class="badge-icon">🐍</span><span class="badge-label">Python</span>
+        <div class="orbit-badge" data-orbit="1" data-index="0" data-angle="0" data-name="Python">
+          <span class="badge-icon"><!-- Python -->
+            <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 2C9.8 2 10.3 5.2 10.3 5.2V8.8h5.9v1H7.8S3 9.3 3 16s4.2 6.5 4.2 6.5h2.5v-3.2s-.1-4.2 4.1-4.2h6.4s3.9.1 3.9-3.8V5.8S24.6 2 16 2zm-2.8 3.2a1.1 1.1 0 110 2.2 1.1 1.1 0 010-2.2z" fill="#3776AB"/>
+              <path d="M16 30c6.2 0 5.7-3.2 5.7-3.2V23.2h-5.9v-1h8.4S29 22.7 29 16s-4.2-6.5-4.2-6.5h-2.5v3.2s.1 4.2-4.1 4.2h-6.4s-3.9-.1-3.9 3.8v5.5S7.4 30 16 30zm2.8-3.2a1.1 1.1 0 110-2.2 1.1 1.1 0 010 2.2z" fill="#FFD43B"/>
+            </svg>
+          </span><span class="badge-label">Python</span>
         </div>
-        <div class="orbit-badge" data-orbit="1" data-index="1" data-angle="90">
-          <span class="badge-icon">📊</span><span class="badge-label">Power BI</span>
+        <div class="orbit-badge" data-orbit="1" data-index="1" data-angle="90" data-name="Power BI">
+          <span class="badge-icon"><!-- Power BI -->
+            <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="19" width="7" height="11" rx="1.5" fill="#F2C811"/>
+              <rect x="12.5" y="12" width="7" height="18" rx="1.5" fill="#F2C811" opacity="0.9"/>
+              <rect x="23" y="5" width="7" height="25" rx="1.5" fill="#F2C811" opacity="0.75"/>
+            </svg>
+          </span><span class="badge-label">Power BI</span>
         </div>
-        <div class="orbit-badge" data-orbit="1" data-index="2" data-angle="180">
-          <span class="badge-icon">🗄️</span><span class="badge-label">SQL</span>
+        <div class="orbit-badge" data-orbit="1" data-index="2" data-angle="180" data-name="MySQL">
+          <span class="badge-icon"><!-- MySQL -->
+            <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <text x="1" y="14" font-family="Arial Black,sans-serif" font-weight="900" font-size="11" fill="#00758F">My</text>
+              <text x="1" y="27" font-family="Arial Black,sans-serif" font-weight="900" font-size="11" fill="#F29111">SQL</text>
+            </svg>
+          </span><span class="badge-label">MySQL</span>
         </div>
-        <div class="orbit-badge" data-orbit="1" data-index="3" data-angle="270">
-          <span class="badge-icon">🟢</span><span class="badge-label">Excel</span>
+        <div class="orbit-badge" data-orbit="1" data-index="3" data-angle="270" data-name="Excel">
+          <span class="badge-icon"><!-- Excel -->
+            <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="5" fill="#217346"/>
+              <path d="M8 8l5 8-5 8h4l3-5 3 5h4l-5-8 5-8h-4l-3 5-3-5z" fill="white"/>
+            </svg>
+          </span><span class="badge-label">Excel</span>
         </div>
-        <div class="orbit-badge" data-orbit="2" data-index="0" data-angle="40">
-          <span class="badge-icon">📈</span><span class="badge-label">Tableau</span>
+        <div class="orbit-badge" data-orbit="2" data-index="0" data-angle="40" data-name="Tableau">
+          <span class="badge-icon"><!-- Tableau real logo -->
+            <svg viewBox="0 0 100 100" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+              <rect x="26" y="35" width="22" height="6" rx="1.5" fill="#E8762B"/>
+              <rect x="34" y="27" width="6" height="22" rx="1.5" fill="#E8762B"/>
+              <rect x="57" y="14" width="16" height="4.5" rx="1.2" fill="#4E9FA8"/>
+              <rect x="62" y="9" width="4.5" height="16" rx="1.2" fill="#4E9FA8"/>
+              <rect x="16" y="20" width="11" height="3" rx="1" fill="#4E9FA8"/>
+              <rect x="20" y="16" width="3" height="11" rx="1" fill="#4E9FA8"/>
+              <rect x="5" y="45" width="11" height="3" rx="1" fill="#4E9FA8"/>
+              <rect x="9" y="41" width="3" height="11" rx="1" fill="#4E9FA8"/>
+              <rect x="14" y="68" width="20" height="6" rx="1.5" fill="#C72535"/>
+              <rect x="21" y="61" width="6" height="20" rx="1.5" fill="#C72535"/>
+              <rect x="50" y="72" width="17" height="5" rx="1.3" fill="#1E3F7E"/>
+              <rect x="56" y="66" width="5" height="17" rx="1.3" fill="#1E3F7E"/>
+              <rect x="69" y="48" width="15" height="4.5" rx="1.2" fill="#6E4DA0"/>
+              <rect x="74" y="43" width="4.5" height="15" rx="1.2" fill="#6E4DA0"/>
+              <rect x="78" y="76" width="12" height="3.5" rx="1" fill="#2E5FA8"/>
+              <rect x="82.5" y="71" width="3.5" height="12" rx="1" fill="#2E5FA8"/>
+            </svg>
+          </span><span class="badge-label">Tableau</span>
         </div>
-        <div class="orbit-badge" data-orbit="2" data-index="1" data-angle="160">
-          <span class="badge-icon">📉</span><span class="badge-label">R Lang</span>
+        <div class="orbit-badge" data-orbit="2" data-index="1" data-angle="160" data-name="R Lang">
+          <span class="badge-icon"><!-- R -->
+            <svg viewBox="0 0 32 32" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="16" cy="13" rx="11" ry="9" fill="none" stroke="#1E6EA6" stroke-width="2.5"/>
+              <path d="M8 8v16" stroke="#1E6EA6" stroke-width="2.8" stroke-linecap="round"/>
+              <path d="M8 13h8c3 0 5 1.5 5 4s-2 4-5 4h-1" stroke="#1E6EA6" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+              <path d="M15 21l5 7" stroke="#8CC0E0" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+          </span><span class="badge-label">R Lang</span>
         </div>
-        <div class="orbit-badge" data-orbit="2" data-index="2" data-angle="280">
-          <span class="badge-icon" style="font-family:'Syne',sans-serif;font-size:0.6rem;font-weight:800;color:#a78bfa;width:auto;background:none;padding:0 2px;">DAX</span><span class="badge-label">DAX</span>
+        <div class="orbit-badge" data-orbit="2" data-index="2" data-angle="280" data-name="DAX">
+          <span class="badge-icon" style="width:auto;background:none;border-radius:0;padding:0 2px;"><!-- DAX -->
+            <svg viewBox="0 0 36 20" width="36" height="20" xmlns="http://www.w3.org/2000/svg">
+              <text x="0" y="15" font-family="Arial Black,sans-serif" font-weight="900" font-size="15" fill="#a78bfa" letter-spacing="1">DAX</text>
+            </svg>
+          </span><span class="badge-label">DAX</span>
         </div>
 
       </div>
@@ -612,11 +160,11 @@
 <!-- Stats -->
 <div class="stats-bar">
   <div class="stat-item">
-    <span class="stat-num" data-count="3">0</span>
+    <span class="stat-num" data-count="2">0</span>
     <span class="stat-label">Years experience</span>
   </div>
   <div class="stat-item">
-    <span class="stat-num" data-count="5">0</span>
+    <span class="stat-num" data-count="6">0</span>
     <span class="stat-label">Key projects</span>
   </div>
   <div class="stat-item">
@@ -624,7 +172,7 @@
     <span class="stat-label">Students trained</span>
   </div>
   <div class="stat-item">
-    <span class="stat-num" data-count="6">0</span>
+    <span class="stat-num" id="tools-stat">7+</span>
     <span class="stat-label">Tools mastered</span>
   </div>
 </div>
@@ -648,16 +196,20 @@
           <div class="progress-track"><div class="progress-fill" data-width="92" style="background: linear-gradient(90deg, #a78bfa, #f472b6);"></div></div>
         </div>
         <div class="progress-row">
+          <div class="progress-label"><span>Python (Pandas, NumPy)</span><span>90%</span></div>
+          <div class="progress-track"><div class="progress-fill" data-width="90" style="background: linear-gradient(90deg, #818cf8, #34d399);"></div></div>
+        </div>
+        <div class="progress-row">
           <div class="progress-label"><span>SQL & MySQL</span><span>88%</span></div>
           <div class="progress-track"><div class="progress-fill" data-width="88" style="background: linear-gradient(90deg, #a78bfa, #818cf8);"></div></div>
         </div>
         <div class="progress-row">
-          <div class="progress-label"><span>Python (Pandas, NumPy)</span><span>82%</span></div>
-          <div class="progress-track"><div class="progress-fill" data-width="82" style="background: linear-gradient(90deg, #818cf8, #34d399);"></div></div>
-        </div>
-        <div class="progress-row">
           <div class="progress-label"><span>Excel & Tableau</span><span>85%</span></div>
           <div class="progress-track"><div class="progress-fill" data-width="85" style="background: linear-gradient(90deg, #34d399, #a78bfa);"></div></div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label"><span>Machine Learning</span><span>82%</span></div>
+          <div class="progress-track"><div class="progress-fill" data-width="82" style="background: linear-gradient(90deg, #818cf8, #34d399);"></div></div>
         </div>
         <div class="progress-row">
           <div class="progress-label"><span>R (Forecasting)</span><span>72%</span></div>
@@ -675,45 +227,142 @@
     <h2 class="skills-heading reveal reveal-delay-1">Tools & Technologies</h2>
     <div class="tools-grid">
       <div class="tool-card reveal reveal-delay-1">
-        <div class="tool-icon">🐍</div>
+        <div class="tool-icon">
+          <svg viewBox="0 0 32 32" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 2C9.8 2 10.3 5.2 10.3 5.2V8.8h5.9v1H7.8S3 9.3 3 16s4.2 6.5 4.2 6.5h2.5v-3.2s-.1-4.2 4.1-4.2h6.4s3.9.1 3.9-3.8V5.8S24.6 2 16 2zm-2.8 3.2a1.1 1.1 0 110 2.2 1.1 1.1 0 010-2.2z" fill="#3776AB"/>
+            <path d="M16 30c6.2 0 5.7-3.2 5.7-3.2V23.2h-5.9v-1h8.4S29 22.7 29 16s-4.2-6.5-4.2-6.5h-2.5v3.2s.1 4.2-4.1 4.2h-6.4s-3.9-.1-3.9 3.8v5.5S7.4 30 16 30zm2.8-3.2a1.1 1.1 0 110-2.2 1.1 1.1 0 010 2.2z" fill="#FFD43B"/>
+          </svg>
+        </div>
         <div>
           <div class="tool-name">Python</div>
           <div class="tool-level">Advanced · Pandas, NumPy, Logging</div>
         </div>
       </div>
       <div class="tool-card reveal reveal-delay-1">
-        <div class="tool-icon">🗄️</div>
+        <div class="tool-icon">
+          <svg viewBox="0 0 32 32" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <text x="1" y="15" font-family="Arial Black,sans-serif" font-weight="900" font-size="12" fill="#00758F">My</text>
+            <text x="1" y="29" font-family="Arial Black,sans-serif" font-weight="900" font-size="12" fill="#F29111">SQL</text>
+          </svg>
+        </div>
         <div>
           <div class="tool-name">MySQL / SQL</div>
           <div class="tool-level">Advanced · Query Optimization</div>
         </div>
       </div>
       <div class="tool-card reveal reveal-delay-2">
-        <div class="tool-icon">📊</div>
+        <div class="tool-icon">
+          <svg viewBox="0 0 32 32" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="16" width="9" height="15" rx="2" fill="#F2C811"/>
+            <rect x="12.5" y="9" width="9" height="22" rx="2" fill="#F2C811" opacity="0.88"/>
+            <rect x="24" y="2" width="7" height="29" rx="2" fill="#F2C811" opacity="0.72"/>
+          </svg>
+        </div>
         <div>
           <div class="tool-name">Power BI</div>
           <div class="tool-level">Advanced · DAX, KPI Dashboards</div>
         </div>
       </div>
       <div class="tool-card reveal reveal-delay-2">
-        <div class="tool-icon">📈</div>
+        <div class="tool-icon">
+          <!-- Tableau real logo: scattered colored plus signs -->
+          <svg viewBox="0 0 100 100" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <!-- large orange center -->
+            <rect x="26" y="35" width="22" height="6" rx="1.5" fill="#E8762B"/>
+            <rect x="34" y="27" width="6" height="22" rx="1.5" fill="#E8762B"/>
+            <!-- medium teal top-right -->
+            <rect x="57" y="14" width="16" height="4.5" rx="1.2" fill="#4E9FA8"/>
+            <rect x="62" y="9" width="4.5" height="16" rx="1.2" fill="#4E9FA8"/>
+            <!-- small teal top-left -->
+            <rect x="16" y="20" width="11" height="3" rx="1" fill="#4E9FA8"/>
+            <rect x="20" y="16" width="3" height="11" rx="1" fill="#4E9FA8"/>
+            <!-- small teal left-mid -->
+            <rect x="5" y="45" width="11" height="3" rx="1" fill="#4E9FA8"/>
+            <rect x="9" y="41" width="3" height="11" rx="1" fill="#4E9FA8"/>
+            <!-- large red bottom-left -->
+            <rect x="14" y="68" width="20" height="6" rx="1.5" fill="#C72535"/>
+            <rect x="21" y="61" width="6" height="20" rx="1.5" fill="#C72535"/>
+            <!-- medium navy bottom-center -->
+            <rect x="50" y="72" width="17" height="5" rx="1.3" fill="#1E3F7E"/>
+            <rect x="56" y="66" width="5" height="17" rx="1.3" fill="#1E3F7E"/>
+            <!-- medium purple right -->
+            <rect x="69" y="48" width="15" height="4.5" rx="1.2" fill="#6E4DA0"/>
+            <rect x="74" y="43" width="4.5" height="15" rx="1.2" fill="#6E4DA0"/>
+            <!-- small blue bottom-right -->
+            <rect x="78" y="76" width="12" height="3.5" rx="1" fill="#2E5FA8"/>
+            <rect x="82.5" y="71" width="3.5" height="12" rx="1" fill="#2E5FA8"/>
+          </svg>
+        </div>
         <div>
           <div class="tool-name">Tableau</div>
           <div class="tool-level">Intermediate · Visual Analytics</div>
         </div>
       </div>
       <div class="tool-card reveal reveal-delay-3">
-        <div class="tool-icon">🟢</div>
+        <div class="tool-icon">
+          <svg viewBox="0 0 32 32" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="5" fill="#217346"/>
+            <path d="M7 7l5.5 9L7 25h4.5l3.5-6 3.5 6H23l-5.5-9L23 7h-4.5L15 13l-3.5-6z" fill="white"/>
+          </svg>
+        </div>
         <div>
           <div class="tool-name">Excel</div>
           <div class="tool-level">Advanced · Pivot Tables, Power Query</div>
         </div>
       </div>
       <div class="tool-card reveal reveal-delay-3">
-        <div class="tool-icon">📉</div>
+        <div class="tool-icon">
+          <svg viewBox="0 0 32 32" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="16" cy="13" rx="12" ry="9" fill="none" stroke="#1E6EA6" stroke-width="2.5"/>
+            <path d="M7 7v18" stroke="#1E6EA6" stroke-width="3" stroke-linecap="round"/>
+            <path d="M7 13h9c3.5 0 5.5 1.8 5.5 4.5s-2 4.5-5.5 4.5H15" stroke="#1E6EA6" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M15 22l6 8" stroke="#6AAFD2" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div>
           <div class="tool-name">R</div>
           <div class="tool-level">Intermediate · ARIMA, Prophet, ggplot2</div>
+        </div>
+      </div>
+      <div class="tool-card reveal reveal-delay-3">
+        <div class="tool-icon">
+          <svg viewBox="0 0 36 36" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <!-- Brain / ML icon: neural network nodes -->
+            <!-- Layer 1 nodes -->
+            <circle cx="6" cy="10" r="3" fill="#a78bfa"/>
+            <circle cx="6" cy="18" r="3" fill="#a78bfa"/>
+            <circle cx="6" cy="26" r="3" fill="#a78bfa"/>
+            <!-- Layer 2 nodes -->
+            <circle cx="18" cy="7"  r="3" fill="#f472b6"/>
+            <circle cx="18" cy="15" r="3" fill="#f472b6"/>
+            <circle cx="18" cy="23" r="3" fill="#f472b6"/>
+            <circle cx="18" cy="31" r="3" fill="#f472b6"/>
+            <!-- Layer 3 nodes -->
+            <circle cx="30" cy="13" r="3" fill="#34d399"/>
+            <circle cx="30" cy="23" r="3" fill="#34d399"/>
+            <!-- Connections L1→L2 -->
+            <line x1="9" y1="10" x2="15" y2="7"  stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+            <line x1="9" y1="10" x2="15" y2="15" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+            <line x1="9" y1="10" x2="15" y2="23" stroke="#a78bfa" stroke-width="0.8" opacity="0.3"/>
+            <line x1="9" y1="18" x2="15" y2="7"  stroke="#a78bfa" stroke-width="0.8" opacity="0.3"/>
+            <line x1="9" y1="18" x2="15" y2="15" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+            <line x1="9" y1="18" x2="15" y2="23" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+            <line x1="9" y1="18" x2="15" y2="31" stroke="#a78bfa" stroke-width="0.8" opacity="0.3"/>
+            <line x1="9" y1="26" x2="15" y2="15" stroke="#a78bfa" stroke-width="0.8" opacity="0.3"/>
+            <line x1="9" y1="26" x2="15" y2="23" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+            <line x1="9" y1="26" x2="15" y2="31" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+            <!-- Connections L2→L3 -->
+            <line x1="21" y1="7"  x2="27" y2="13" stroke="#f472b6" stroke-width="0.8" opacity="0.5"/>
+            <line x1="21" y1="15" x2="27" y2="13" stroke="#f472b6" stroke-width="0.8" opacity="0.5"/>
+            <line x1="21" y1="15" x2="27" y2="23" stroke="#f472b6" stroke-width="0.8" opacity="0.4"/>
+            <line x1="21" y1="23" x2="27" y2="13" stroke="#f472b6" stroke-width="0.8" opacity="0.4"/>
+            <line x1="21" y1="23" x2="27" y2="23" stroke="#f472b6" stroke-width="0.8" opacity="0.5"/>
+            <line x1="21" y1="31" x2="27" y2="23" stroke="#f472b6" stroke-width="0.8" opacity="0.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="tool-name">Machine Learning</div>
+          <div class="tool-level">Intermediate · Scikit-learn, Regression, Classification</div>
         </div>
       </div>
     </div>
@@ -781,7 +430,7 @@
         <span class="tag">ggplot2</span>
       </div>
     </div>
-    <div class="project-card reveal reveal-delay-1" style="grid-column: span 2;">
+    <div class="project-card reveal reveal-delay-1">
       <div class="project-num">05 — HR Analytics</div>
       <div class="project-title">HR Analytics Dashboard</div>
       <div class="project-desc">Dashboard analyzing employee attrition, departmental KPIs, and demographics to help HR leaders make data-driven workforce decisions.</div>
@@ -789,6 +438,18 @@
         <span class="tag">Power BI</span>
         <span class="tag">DAX</span>
         <span class="tag pink">HR Tech</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-2" style="border-color: rgba(251,191,36,0.3); background: linear-gradient(135deg, rgba(251,191,36,0.06), rgba(167,139,250,0.04));">
+      <div class="project-glow" style="background: radial-gradient(circle, rgba(251,191,36,0.12), transparent 70%);"></div>
+      <div class="project-num" style="color:#fbbf24;">⚡ Ongoing Project</div>
+      <div class="project-title">Gold Price Prediction</div>
+      <div class="project-desc">Machine learning model to predict gold prices using historical market data, macroeconomic indicators (USD index, oil prices, interest rates), and time-series analysis. Aims to deliver actionable forecasts for investment decision-making.</div>
+      <div class="project-tags">
+        <span class="tag" style="color:#fbbf24;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);">Python</span>
+        <span class="tag" style="color:#fbbf24;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);">ML</span>
+        <span class="tag" style="color:#fbbf24;background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.25);">Time Series</span>
+        <span class="tag green">In Progress</span>
       </div>
     </div>
   </div>
@@ -841,7 +502,7 @@
       <div class="edu-degree">M.Sc. in Business Analytics</div>
       <div class="edu-school">Manipal School of Commerce and Economics, MAHE</div>
       <div class="edu-year">2024 — 2026</div>
-      <div class="edu-cgpa">8.95 <span>/ 10 CGPA</span></div>
+      <div class="edu-cgpa">8.87 <span>/ 10 CGPA</span></div>
     </div>
     <div class="edu-card reveal reveal-delay-2">
       <div class="edu-degree">BVoc Data Science</div>
@@ -883,169 +544,10 @@
 
 <footer>
   <span>© 2025 Aswathy TK — Data Analyst</span>
-  <span>Built with code · Powered by data</span>
+ 
+  <!-- <span>Built with code · Powered by data</span> -->
 </footer>
 
-<script>
-// ── Custom cursor ──────────────────────────────────────────
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursor-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-});
-function animateRing() {
-  rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(animateRing);
-}
-animateRing();
-document.querySelectorAll('a, button, .tool-card, .project-card, .edu-card, .orbit-badge').forEach(el => {
-  el.addEventListener('mouseenter', () => { cursor.style.width='20px'; cursor.style.height='20px'; ring.style.width='50px'; ring.style.height='50px'; });
-  el.addEventListener('mouseleave', () => { cursor.style.width='12px'; cursor.style.height='12px'; ring.style.width='36px'; ring.style.height='36px'; });
-});
-
-// ── Background particles ───────────────────────────────────
-const pCanvas = document.getElementById('particle-canvas');
-const pCtx = pCanvas.getContext('2d');
-pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight;
-window.addEventListener('resize', () => { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; });
-const particles = [];
-const PCOLS = ['#a78bfa','#f472b6','#34d399','#818cf8'];
-for (let i = 0; i < 80; i++) {
-  particles.push({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3, r:Math.random()*1.5+0.5, color:PCOLS[Math.floor(Math.random()*PCOLS.length)], alpha:Math.random()*0.5+0.1 });
-}
-function drawParticles() {
-  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
-  particles.forEach(p => {
-    p.x+=p.vx; p.y+=p.vy;
-    if(p.x<0)p.x=pCanvas.width; if(p.x>pCanvas.width)p.x=0;
-    if(p.y<0)p.y=pCanvas.height; if(p.y>pCanvas.height)p.y=0;
-    pCtx.beginPath(); pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    pCtx.fillStyle=p.color+Math.floor(p.alpha*255).toString(16).padStart(2,'0');
-    pCtx.fill();
-  });
-  for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
-    const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<100){ pCtx.beginPath(); pCtx.moveTo(particles[i].x,particles[i].y); pCtx.lineTo(particles[j].x,particles[j].y); pCtx.strokeStyle=`rgba(167,139,250,${0.06*(1-dist/100)})`; pCtx.lineWidth=0.5; pCtx.stroke(); }
-  }
-  requestAnimationFrame(drawParticles);
-}
-drawParticles();
-
-// ── Orbit animation ────────────────────────────────────────
-(function initOrbit() {
-  const container = document.getElementById('orbitContainer');
-  if (!container) return;
-
-  const oCanvas = document.getElementById('orbit-canvas');
-  const oCtx = oCanvas.getContext('2d');
-  const badges = [...container.querySelectorAll('.orbit-badge')];
-
-  // Two orbit radii (inner, outer)
-  const RADII = [148, 218];
-  // Speeds in radians/ms (inner faster, outer slower, opposite direction)
-  const SPEEDS = [0.00045, -0.00028];
-
-  // Track current angle offsets
-  const offsets = [0, 0];
-
-  // Initial angles per badge (from data-angle attr, converted to radians)
-  const initAngles = badges.map(b => (parseFloat(b.dataset.angle) * Math.PI) / 180);
-  const orbitIdx   = badges.map(b => parseInt(b.dataset.orbit) - 1); // 0 or 1
-
-  function resize() {
-    const size = container.offsetWidth;
-    oCanvas.width  = size;
-    oCanvas.height = size;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  let lastTime = null;
-
-  function tick(ts) {
-    if (lastTime === null) lastTime = ts;
-    const dt = ts - lastTime;
-    lastTime = ts;
-
-    offsets[0] += SPEEDS[0] * dt;
-    offsets[1] += SPEEDS[1] * dt;
-
-    const size = oCanvas.width;
-    const cx = size / 2, cy = size / 2;
-
-    // Draw rings
-    oCtx.clearRect(0, 0, size, size);
-    RADII.forEach((r, i) => {
-      oCtx.beginPath();
-      oCtx.arc(cx, cy, r, 0, Math.PI * 2);
-      oCtx.strokeStyle = i === 0
-        ? 'rgba(167,139,250,0.22)'
-        : 'rgba(167,139,250,0.12)';
-      oCtx.lineWidth = 1;
-      oCtx.setLineDash([5, 7]);
-      oCtx.stroke();
-      oCtx.setLineDash([]);
-    });
-
-    // Draw small dot glow at center
-    const glowR = 104; // photo radius
-    const grad = oCtx.createRadialGradient(cx,cy,glowR*0.5, cx,cy, glowR*1.5);
-    grad.addColorStop(0, 'rgba(167,139,250,0.08)');
-    grad.addColorStop(1, 'rgba(167,139,250,0)');
-    oCtx.beginPath(); oCtx.arc(cx,cy,glowR*1.5,0,Math.PI*2);
-    oCtx.fillStyle = grad; oCtx.fill();
-
-    // Position each badge
-    badges.forEach((badge, i) => {
-      const oi = orbitIdx[i];
-      const angle = initAngles[i] + offsets[oi];
-      const r = RADII[oi];
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-      badge.style.left = x + 'px';
-      badge.style.top  = y + 'px';
-    });
-
-    requestAnimationFrame(tick);
-  }
-
-  requestAnimationFrame(tick);
-})();
-
-// ── Scroll reveal ──────────────────────────────────────────
-const reveals = document.querySelectorAll('.reveal, .timeline-item');
-const revObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-reveals.forEach(el => revObs.observe(el));
-
-// ── Counter animation ──────────────────────────────────────
-const counters = document.querySelectorAll('[data-count]');
-const cntObs = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const el = entry.target, target = parseInt(el.dataset.count);
-      let cur = 0; const step = target/40;
-      const t = setInterval(() => { cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=Math.floor(cur)+(target>=30?'+':''); }, 30);
-      cntObs.unobserve(el);
-    }
-  });
-}, { threshold: 0.5 });
-counters.forEach(el => cntObs.observe(el));
-
-// ── Progress bars ──────────────────────────────────────────
-const progObs = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.querySelectorAll('.progress-fill').forEach(bar => { bar.style.width = bar.dataset.width + '%'; });
-      progObs.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.3 });
-document.querySelectorAll('.about-card').forEach(el => progObs.observe(el));
-</script>
+<script src="script.js"></script>
 </body>
 </html>

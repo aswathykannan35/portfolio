@@ -62,7 +62,7 @@
     color: var(--accent);
     letter-spacing: -0.02em;
   }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
   .nav-links a {
     color: var(--muted); text-decoration: none;
     font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
@@ -76,6 +76,22 @@
   }
   .nav-links a:hover { color: var(--accent); }
   .nav-links a:hover::after { width: 100%; }
+  .nav-resume {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #080810; background: var(--accent);
+    padding: 0.45rem 1.1rem; border-radius: 2rem;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    white-space: nowrap;
+  }
+  .nav-resume:hover {
+    background: #c4b5fd;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px var(--glow);
+  }
+  .nav-resume svg { flex-shrink: 0; }
 
   /* Sections */
   section { position: relative; z-index: 1; }
@@ -155,7 +171,7 @@
   }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* Hero Right — photo + orbiting tools */
+  /* Hero Right */
   .hero-right {
     position: relative;
     display: flex; align-items: center; justify-content: center;
@@ -164,28 +180,19 @@
   }
   .orbit-container {
     position: relative;
-    width: 420px; height: 420px;
+    width: 460px; height: 460px;
   }
-  /* Dashed orbit rings */
-  .orbit-ring {
-    position: absolute; border-radius: 50%;
-    border: 1px dashed rgba(167,139,250,0.25);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .orbit-ring-1 { width: 320px; height: 320px; }
-  .orbit-ring-2 { width: 420px; height: 420px; border-color: rgba(167,139,250,0.13); }
 
   /* Center photo */
   .hero-photo-wrap {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 220px; height: 220px;
+    width: 200px; height: 200px;
     border-radius: 50%;
     border: 3px solid var(--accent);
     box-shadow: 0 0 40px rgba(167,139,250,0.35), 0 0 80px rgba(167,139,250,0.1);
     overflow: hidden;
-    z-index: 2;
+    z-index: 3;
     background: var(--surface);
   }
   .hero-photo-wrap img {
@@ -194,81 +201,72 @@
   .hero-photo-placeholder {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800;
+    font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800;
     background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(244,114,182,0.2));
     color: var(--accent);
   }
 
-  /* Orbiting tool icons */
-  .orbit-track-1 {
-    position: absolute; top: 50%; left: 50%;
-    width: 320px; height: 320px;
-    margin-top: -160px; margin-left: -160px;
-    border-radius: 50%;
-    animation: orbit1 14s linear infinite;
+  /* Orbit canvas sits behind photo */
+  #orbit-canvas {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
   }
-  .orbit-track-2 {
-    position: absolute; top: 50%; left: 50%;
-    width: 420px; height: 420px;
-    margin-top: -210px; margin-left: -210px;
-    border-radius: 50%;
-    animation: orbit2 20s linear infinite;
-  }
-  .orbit-icon {
+
+  /* Floating tool pill badges – positioned by JS */
+  .orbit-badge {
     position: absolute;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    transition: transform 0.3s;
-    top: 50%; left: 50%;
+    background: rgba(14,14,26,0.92);
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 50%;
+    width: 46px; height: 46px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 12px rgba(167,139,250,0.12);
+    z-index: 4;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    transition: box-shadow 0.25s, border-color 0.25s, transform 0.2s;
+    cursor: default;
+    backdrop-filter: blur(8px);
   }
-  .orbit-icon:hover {
-    transform: translate(-50%, -50%) scale(1.2) !important;
+  .orbit-badge:hover {
     border-color: var(--accent);
-    box-shadow: 0 4px 20px var(--glow);
-    z-index: 10;
+    box-shadow: 0 4px 24px rgba(167,139,250,0.35);
+    transform: translate(-50%, -50%) scale(1.15);
   }
-  /* Position icons on the ring via transform-origin trick */
-  /* Track 1: 4 icons placed at 0°, 90°, 180°, 270° */
-  .orbit-track-1 .icon-0 { transform: translate(-50%, -50%) rotate(0deg) translateX(160px) rotate(0deg); }
-  .orbit-track-1 .icon-1 { transform: translate(-50%, -50%) rotate(90deg) translateX(160px) rotate(-90deg); }
-  .orbit-track-1 .icon-2 { transform: translate(-50%, -50%) rotate(180deg) translateX(160px) rotate(-180deg); }
-  .orbit-track-1 .icon-3 { transform: translate(-50%, -50%) rotate(270deg) translateX(160px) rotate(-270deg); }
-  /* Track 2: 3 icons at 45°, 165°, 285° */
-  .orbit-track-2 .icon-0 { transform: translate(-50%, -50%) rotate(45deg) translateX(210px) rotate(-45deg); }
-  .orbit-track-2 .icon-1 { transform: translate(-50%, -50%) rotate(165deg) translateX(210px) rotate(-165deg); }
-  .orbit-track-2 .icon-2 { transform: translate(-50%, -50%) rotate(285deg) translateX(210px) rotate(-285deg); }
-
-  @keyframes orbit1 {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  .orbit-badge .badge-icon {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  @keyframes orbit2 {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
+  /* Hide label — show as tooltip on hover */
+  .orbit-badge .badge-label {
+    display: none;
   }
-  /* Counter-rotate icon labels so they stay upright */
-  .orbit-track-1 { }
-  .orbit-track-1 .orbit-icon { animation: counter1 14s linear infinite; }
-  .orbit-track-2 .orbit-icon { animation: counter2 20s linear infinite; }
-  @keyframes counter1 {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(-360deg); }
-  }
-  @keyframes counter2 {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-
-  .tool-tip {
-    position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
-    font-size: 0.55rem; color: var(--muted); white-space: nowrap;
-    letter-spacing: 0.05em; font-family: 'DM Mono', monospace;
+  .orbit-badge::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%; transform: translateX(-50%);
+    background: rgba(14,14,26,0.96);
+    border: 1px solid rgba(167,139,250,0.4);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.1em;
     text-transform: uppercase;
+    white-space: nowrap;
+    padding: 4px 10px;
+    border-radius: 2rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateX(-50%) translateY(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .orbit-badge:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 
   .scroll-indicator {
@@ -282,28 +280,108 @@
     background: linear-gradient(to bottom, var(--accent), transparent);
   }
 
-  @media (max-width: 900px) {
-    #hero { padding: 7rem 1.5rem 4rem; }
-    .hero-inner { grid-template-columns: 1fr; text-align: center; }
-    .hero-name, .hero-sub { text-align: center; }
-    .hero-cta { justify-content: center; }
-    .hero-right { margin-top: 3rem; }
-    .orbit-container { width: 320px; height: 320px; }
-    .orbit-ring-1 { width: 240px; height: 240px; }
-    .orbit-ring-2 { width: 320px; height: 320px; }
-    .hero-photo-wrap { width: 170px; height: 170px; }
-    .orbit-track-1 { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
-    .orbit-track-2 { width: 320px; height: 320px; margin-top: -160px; margin-left: -160px; }
-    .orbit-track-1 .icon-0 { transform: translate(-50%, -50%) rotate(0deg) translateX(120px) rotate(0deg); }
-    .orbit-track-1 .icon-1 { transform: translate(-50%, -50%) rotate(90deg) translateX(120px) rotate(-90deg); }
-    .orbit-track-1 .icon-2 { transform: translate(-50%, -50%) rotate(180deg) translateX(120px) rotate(-180deg); }
-    .orbit-track-1 .icon-3 { transform: translate(-50%, -50%) rotate(270deg) translateX(120px) rotate(-270deg); }
-    .orbit-track-2 .icon-0 { transform: translate(-50%, -50%) rotate(45deg) translateX(160px) rotate(-45deg); }
-    .orbit-track-2 .icon-1 { transform: translate(-50%, -50%) rotate(165deg) translateX(160px) rotate(-165deg); }
-    .orbit-track-2 .icon-2 { transform: translate(-50%, -50%) rotate(285deg) translateX(160px) rotate(-285deg); }
+  /* ── RESPONSIVE ──────────────────────────────────────── */
+
+  /* Tablet landscape: 1024px */
+  @media (max-width: 1024px) {
+    #hero { padding: 7rem 3rem 4rem; }
+    .hero-inner { gap: 2.5rem; }
+    .orbit-container { width: 380px; height: 380px; }
+    .about-grid { gap: 3rem; }
+    .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    #about { padding: 6rem 3rem; }
   }
 
-  /* Stats bar */
+  /* Tablet portrait: 900px */
+  @media (max-width: 900px) {
+    #hero { padding: 7rem 2rem 5rem; }
+    .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
+    .hero-name, .hero-sub { text-align: center; max-width: 100%; }
+    .hero-cta { justify-content: center; }
+    .hero-right { margin-top: 1rem; }
+    .orbit-container { width: 340px; height: 340px; }
+    .hero-photo-wrap { width: 150px; height: 150px; }
+    .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .projects-grid { grid-template-columns: 1fr 1fr; }
+    .project-card.featured { grid-column: span 2; }
+    .edu-grid { grid-template-columns: 1fr 1fr; }
+    nav { padding: 1rem 2rem; }
+    .nav-links { gap: 1.2rem; }
+    .nav-links a { font-size: 0.65rem; }
+  }
+
+  /* Mobile large: 768px */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.2rem; }
+    .nav-links { display: none; }
+
+    /* Hamburger placeholder – visible on mobile */
+    .nav-mobile-hint {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em;
+    }
+
+    #hero { padding: 6rem 1.5rem 4rem; min-height: 100svh; }
+    .hero-inner { gap: 2.5rem; }
+    .hero-name { font-size: clamp(2.4rem, 9vw, 3.5rem); }
+    .hero-tag { font-size: 0.6rem; }
+    .hero-sub { font-size: 0.8rem; }
+    .btn-primary, .btn-ghost { padding: 0.75rem 1.5rem; font-size: 0.75rem; }
+    .orbit-container { width: 300px; height: 300px; }
+    .hero-photo-wrap { width: 130px; height: 130px; }
+
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .stat-item { padding: 1.5rem 1rem; }
+    .stat-num { font-size: 2rem; }
+
+    #about, #skills, #projects, #experience, #education, #contact { padding: 4rem 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .tool-icon svg { width: 28px; height: 28px; }
+    .tool-name { font-size: 0.85rem; }
+    .tool-level { font-size: 0.6rem; }
+
+    .projects-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .project-card.featured { grid-column: span 1; }
+    .project-card[style*="grid-column: span 2"] { grid-column: span 1 !important; }
+    .project-title { font-size: 1rem; }
+    .project-card.featured .project-title { font-size: 1.2rem; }
+    .projects-header { flex-direction: column; gap: 0.5rem; }
+
+    .timeline::before { left: 6px; }
+    .timeline-item { padding-left: 2rem; }
+    .timeline-dot { left: 0; }
+    .exp-role { font-size: 1rem; }
+
+    .edu-grid { grid-template-columns: 1fr; }
+    .edu-card { padding: 1.5rem; }
+    .edu-cgpa { font-size: 1.6rem; }
+
+    .contact-heading { font-size: clamp(2.2rem, 10vw, 4rem); }
+    .social-links { flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+    .social-link { padding: 0.6rem 1rem; font-size: 0.65rem; }
+
+    .section-label { font-size: 0.6rem; }
+    .about-heading, .skills-heading, .projects-heading, .exp-heading, .edu-heading {
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+    }
+    footer { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1.5rem; }
+    .exp-inner, .skills-inner { padding: 0; }
+  }
+
+  /* Mobile small: 480px */
+  @media (max-width: 480px) {
+    .orbit-container { width: 270px; height: 270px; }
+    .hero-photo-wrap { width: 115px; height: 115px; }
+    .orbit-badge { width: 38px; height: 38px; }
+    .orbit-badge .badge-icon svg { width: 18px; height: 18px; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .hero-name { font-size: clamp(2rem, 8vw, 3rem); }
+    .contact-heading { font-size: clamp(1.8rem, 8vw, 3rem); }
+    .hero-cta { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-ghost { width: 100%; max-width: 220px; text-align: center; }
+  }
   .stats-bar {
     display: grid; grid-template-columns: repeat(4, 1fr);
     border-top: 1px solid var(--border);
@@ -369,7 +447,7 @@
     font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 800; margin-bottom: 4rem; letter-spacing: -0.03em;
   }
-  .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
   .tool-card {
     background: var(--bg); border: 1px solid var(--border);
     border-radius: 0.75rem; padding: 1.5rem;
@@ -554,15 +632,3 @@
   .reveal-delay-1 { transition-delay: 0.1s; }
   .reveal-delay-2 { transition-delay: 0.2s; }
   .reveal-delay-3 { transition-delay: 0.3s; }
-
-  @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { display: none; }
-    .stats-bar { grid-template-columns: repeat(2, 1fr); }
-    .about-grid, .tools-grid, .projects-grid, .edu-grid { grid-template-columns: 1fr; }
-    .project-card.featured { grid-column: span 1; }
-    .projects-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    #about, #projects, #experience, #education, #contact, #skills { padding: 5rem 1.5rem; }
-    .exp-inner, .skills-inner { padding: 0; }
-    footer { flex-direction: column; gap: 1rem; text-align: center; }
-  }
