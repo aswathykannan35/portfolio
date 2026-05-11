@@ -139,8 +139,9 @@ const cntObs = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const el = entry.target, target = parseInt(el.dataset.count);
+      const suffix = el.dataset.suffix || (target >= 30 ? '+' : '');
       let cur = 0; const step = target/40;
-      const t = setInterval(() => { cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=Math.floor(cur)+(target>=30?'+':''); }, 30);
+      const t = setInterval(() => { cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=Math.floor(cur)+suffix; }, 30);
       cntObs.unobserve(el);
     }
   });
